@@ -1,24 +1,29 @@
-# Very short description of the package
+# URL query string manipulations helper
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/vitnasinec/uri.svg?style=flat-square)](https://packagist.org/packages/vitnasinec/uri)
-[![Build Status](https://img.shields.io/travis/vitnasinec/uri/master.svg?style=flat-square)](https://travis-ci.org/vitnasinec/uri)
-[![Quality Score](https://img.shields.io/scrutinizer/g/vitnasinec/uri.svg?style=flat-square)](https://scrutinizer-ci.com/g/vitnasinec/uri)
-[![Total Downloads](https://img.shields.io/packagist/dt/vitnasinec/uri.svg?style=flat-square)](https://packagist.org/packages/vitnasinec/uri)
-
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what PSRs you support to avoid any confusion with users and contributors.
+Adds/removes/updates query string of current request uri, accepts Laravel's array "dot" notation
 
 ## Installation
 
 You can install the package via composer:
 
 ```bash
-composer require vitnasinec/uri
+composer require vitnasinec/uri 
 ```
 
 ## Usage
 
 ``` php
-// Usage description here
+// ...?filter[foo]=bar&sort=-baz
+
+uri()->addQuery('filter.other', 'next');
+// ...?filter[foo]=bar&filter[other]=next&sort=-baz
+
+uri()->removeQuery('filter.foo')
+// ...?sort=-baz
+
+uri()->mergeQuery(['filter.foo' => 'changed', 'filter.other' => 'next']);
+// ...?filter[foo]=changed&filter[other]=next&sort=-baz
+
 ```
 
 ### Testing
