@@ -1,6 +1,6 @@
 <?php
 
-namespace Vitnasinec\Uri;
+use Vitnasinec\Uri\Uri;
 
 /**
  * Uri generator
