@@ -4,7 +4,6 @@ namespace Vitnasinec\Uri\Tests;
 
 use Illuminate\Http\Request;
 use Orchestra\Testbench\TestCase;
-use function Vitnasinec\Uri\uri;
 
 class UriTest extends TestCase
 {
