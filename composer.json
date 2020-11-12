@@ -1,0 +1,55 @@
+{
+    "name": "vitnasinec/uri",
+    "description": "",
+    "keywords": [
+        "vitnasinec",
+        "uri"
+    ],
+    "homepage": "https://github.com/vitnasinec/uri",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Vit Nasinec",
+            "email": "vitnasinec@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.4",
+        "illuminate/http": "*",
+        "illuminate/routing": "*",
+        "illuminate/support": "*"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^6.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vitnasinec\\Uri\\": "src"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Vitnasinec\\Uri\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Vitnasinec\\Uri\\UriServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
