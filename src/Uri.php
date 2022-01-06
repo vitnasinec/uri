@@ -35,11 +35,25 @@ class Uri implements Htmlable
         $this->urlGenerator = app(UrlGenerator::class);
 
         if ($fromString) {
-            // @TODO
-            // $this->fromString();
+            $this->fromString($fromString);
         } else {
             $this->fromRequest();
         }
+    }
+
+    /**
+     * Initialize from string request
+     *
+     * @param string $fromString
+     * @return void
+     */
+    protected function fromString(string $fromString)
+    {
+        $this->path = parse_url($fromString, PHP_URL_PATH);
+        parse_str(
+            parse_url($fromString, PHP_URL_QUERY),
+            $this->query
+        );
     }
 
     /**

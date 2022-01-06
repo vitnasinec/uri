@@ -27,6 +27,17 @@ class UriTest extends TestCase
     }
 
     /** @test */
+    public function it_builds_uri_from_string()
+    {
+        $fromString = '/lorem?filter[ipsum]=sit&sort=-amet';
+
+        $this->assertEquals(
+            url($fromString),
+            uri($fromString)->build()
+        );
+    }
+
+    /** @test */
     public function it_replaces_path()
     {
         $this->assertEquals(
