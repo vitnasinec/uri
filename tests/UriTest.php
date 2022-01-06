@@ -27,6 +27,15 @@ class UriTest extends TestCase
     }
 
     /** @test */
+    public function it_replaces_path()
+    {
+        $this->assertEquals(
+            'https://domain-name.com/new/path?filter[foo]=bar&sort=-baz',
+            uri()->path('/new/path')->build()
+        );
+    }
+
+    /** @test */
     public function it_replaces_whole_query()
     {
         $this->assertEquals(

@@ -70,6 +70,19 @@ class Uri implements Htmlable
     }
 
     /**
+     * path
+     *
+     * @param string $path
+     * @return $this
+     */
+    public function path(string $path)
+    {
+        $this->path = $path;
+
+        return $this;
+    }
+
+    /**
      * Alias to mergeQuery
      *
      * @param array $query
