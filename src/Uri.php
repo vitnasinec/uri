@@ -115,12 +115,23 @@ class Uri implements Htmlable
      *
      * @return $this
      */
-    public function mergeQuery(array $query)
+    public function mergeQuery(array $query, bool $replace = true)
     {
         $query = Arr::dot($query);
+
         foreach ($query as $key => $value) {
+            if (! $replace && Arr::exists(Arr::dot($this->query), $key)) {
+                continue;
+            }
             Arr::set($this->query, $key, $value);
         }
+
+        return $this;
+    }
+
+    public function mergeMissingQuery(array $query): self
+    {
+        $this->mergeQuery($query, replace: false);
 
         return $this;
     }

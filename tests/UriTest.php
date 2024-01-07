@@ -83,6 +83,15 @@ class UriTest extends TestCase
     }
 
     /** @test */
+    public function it_merges_missing_query_param()
+    {
+        $this->assertEquals(
+            'filter[foo]=bar&filter[other]=next&sort=-baz',
+            uri()->mergeMissingQuery(['filter' => ['foo' => 'change', 'other' => 'next']])->buildQuery()
+        );
+    }
+
+    /** @test */
     public function it_replaces_single_query_param()
     {
         $this->assertEquals(
