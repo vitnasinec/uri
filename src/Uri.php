@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vitnasinec\Uri;
 
 use Illuminate\Contracts\Routing\UrlGenerator;
@@ -10,30 +12,26 @@ use Illuminate\Support\Str;
 
 class Uri implements Htmlable
 {
-    protected $request;
+    protected Request $request;
 
-    protected $urlGenerator;
+    protected UrlGenerator $urlGenerator;
 
     protected string $scheme;
 
     protected string $host;
 
-    protected $path = '/';
+    protected string $path = '/';
 
-    protected $query = [];
+    /** @var array<string> */
+    protected array $query = [];
 
-    protected $decode = [
+    /** @var array<string> */
+    protected array $decode = [
         '%5B' => '[',
         '%5D' => ']',
         '%2C' => ',',
     ];
 
-    /**
-     * __construct
-     *
-     * @param  ?string  $fromString
-     * @return void
-     */
     public function __construct(string $fromString = null)
     {
         $this->urlGenerator = app(UrlGenerator::class);
@@ -46,43 +44,29 @@ class Uri implements Htmlable
         }
     }
 
-    /**
-     * Initialize from string request
-     *
-     * @return void
-     */
-    protected function fromString(string $fromString)
+    protected function fromString(string $fromString): void
     {
-        $this->scheme = parse_url($fromString, PHP_URL_SCHEME) ?? $this->request->getScheme();
-        $this->host = parse_url($fromString, PHP_URL_HOST) ?? $this->request->getHost();
-        $this->path = parse_url($fromString, PHP_URL_PATH) ?? '/';
+        $this->scheme = parse_url($fromString, PHP_URL_SCHEME) ?: $this->request->getScheme();
+        $this->host = parse_url($fromString, PHP_URL_HOST) ?: $this->request->getHost();
+        $this->path = parse_url($fromString, PHP_URL_PATH) ?: '/';
         parse_str(
-            parse_url($fromString, PHP_URL_QUERY) ?? '',
+            parse_url($fromString, PHP_URL_QUERY) ?: '',
             $this->query
         );
     }
 
-    /**
-     * Initialize from current request
-     *
-     * @return void
-     */
-    protected function fromRequest()
+    protected function fromRequest(): void
     {
         $this->scheme = $this->request->getScheme();
         $this->host = $this->request->getHost();
         $this->path = $this->request->path();
-        $this->query = $this->request->query();
+        $this->query = is_array($this->request->query()) ? $this->request->query() : [];
     }
 
     /**
-     * route
-     *
-     * @param  string  $name
-     * @param  mixed  $params
-     * @return $this
+     * @param  array<mixed>  $params
      */
-    public function route($name, $params = [])
+    public function route(string $name, array $params = []): self
     {
         $this->query = [];
         $this->path = route($name, $params, false);
@@ -90,12 +74,7 @@ class Uri implements Htmlable
         return $this;
     }
 
-    /**
-     * path
-     *
-     * @return $this
-     */
-    public function path(string $path)
+    public function path(string $path): self
     {
         $this->path = $path;
 
@@ -105,21 +84,17 @@ class Uri implements Htmlable
     /**
      * Alias to mergeQuery
      *
-     *
-     * @return $this
+     * @param  array<string|numeric>  $query
      */
-    public function query(array $query)
+    public function query(array $query): self
     {
         return $this->mergeQuery($query);
     }
 
     /**
-     * Merge query
-     *
-     *
-     * @return $this
+     * @param  array<string|numeric>  $query
      */
-    public function mergeQuery(array $query, bool $replace = true)
+    public function mergeQuery(array $query, bool $replace = true): self
     {
         $query = Arr::dot($query);
 
@@ -133,6 +108,9 @@ class Uri implements Htmlable
         return $this;
     }
 
+    /**
+     * @param  array<string|numeric>  $query
+     */
     public function mergeMissingQuery(array $query): self
     {
         $this->mergeQuery($query, replace: false);
@@ -141,12 +119,9 @@ class Uri implements Htmlable
     }
 
     /**
-     * Replace whole query
-     *
-     *
-     * @return $this
+     * @param  array<string|numeric>  $query
      */
-    public function replaceQuery(array $query)
+    public function replaceQuery(array $query): self
     {
         $this->query = [];
 
@@ -154,26 +129,16 @@ class Uri implements Htmlable
     }
 
     /**
-     * Add or replace single query param
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return $this
+     * @param  string|numeric|bool|null  $value
      */
-    public function addQuery($key, $value)
+    public function addQuery(string $key, $value): self
     {
         Arr::set($this->query, $key, $value);
 
         return $this;
     }
 
-    /**
-     * Remove single query param
-     *
-     * @param  string  $key
-     * @return $this
-     */
-    public function removeQuery($key)
+    public function removeQuery(string $key): self
     {
         Arr::forget($this->query, $key);
 
@@ -181,12 +146,10 @@ class Uri implements Htmlable
     }
 
     /**
-     * Transform bool values to string
-     *
-     *
-     * @return array
+     * @param  array<mixed>  $query
+     * @return array<string, mixed>
      */
-    protected function stringifyBoolQueryValues(array $query)
+    protected function stringifyBoolQueryValues(array $query): array
     {
         return array_map(function ($value) {
             if (is_array($value)) {
@@ -205,12 +168,7 @@ class Uri implements Htmlable
         }, $query);
     }
 
-    /**
-     * Build the query string
-     *
-     * @return string
-     */
-    public function buildQuery()
+    public function buildQuery(): string
     {
         $queryString = http_build_query(
             $this->stringifyBoolQueryValues($this->query)
@@ -225,12 +183,7 @@ class Uri implements Htmlable
         return $decodedQueryString;
     }
 
-    /**
-     * Build full url
-     *
-     * @return string
-     */
-    public function build()
+    public function build(): string
     {
         $queryString = count($this->query)
             ? "?{$this->buildQuery()}"
@@ -241,22 +194,12 @@ class Uri implements Htmlable
             .$queryString;
     }
 
-    /**
-     * Htmlable
-     *
-     * @return string
-     */
-    public function toHtml()
+    public function toHtml(): string
     {
         return $this->build();
     }
 
-    /**
-     * __toString
-     *
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->build();
     }

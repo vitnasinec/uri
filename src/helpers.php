@@ -2,15 +2,8 @@
 
 use Vitnasinec\Uri\Uri;
 
-/**
- * Uri generator
- *
- * @param ?string $fromString
- *
- * @return App\Utilities\Uri\Uri
- */
 if (! function_exists('uri')) {
-    function uri(?string $fromString = null)
+    function uri(string $fromString = null): Uri
     {
         return new Uri($fromString);
     }
