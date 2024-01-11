@@ -11,9 +11,15 @@ use Illuminate\Support\Str;
 class Uri implements Htmlable
 {
     protected $request;
+
     protected $urlGenerator;
 
+    protected string $scheme;
+
+    protected string $host;
+
     protected $path = '/';
+
     protected $query = [];
 
     protected $decode = [
@@ -25,14 +31,13 @@ class Uri implements Htmlable
     /**
      * __construct
      *
-     * @param ?string $fromString
-     *
+     * @param  ?string  $fromString
      * @return void
      */
-    public function __construct(?string $fromString = null)
+    public function __construct(string $fromString = null)
     {
-        $this->request = app(Request::class);
         $this->urlGenerator = app(UrlGenerator::class);
+        $this->request = app(Request::class);
 
         if ($fromString) {
             $this->fromString($fromString);
@@ -44,12 +49,13 @@ class Uri implements Htmlable
     /**
      * Initialize from string request
      *
-     * @param string $fromString
      * @return void
      */
     protected function fromString(string $fromString)
     {
-        $this->path = parse_url($fromString, PHP_URL_PATH);
+        $this->scheme = parse_url($fromString, PHP_URL_SCHEME) ?? $this->request->getScheme();
+        $this->host = parse_url($fromString, PHP_URL_HOST) ?? $this->request->getHost();
+        $this->path = parse_url($fromString, PHP_URL_PATH) ?? '/';
         parse_str(
             parse_url($fromString, PHP_URL_QUERY) ?? '',
             $this->query
@@ -63,6 +69,8 @@ class Uri implements Htmlable
      */
     protected function fromRequest()
     {
+        $this->scheme = $this->request->getScheme();
+        $this->host = $this->request->getHost();
         $this->path = $this->request->path();
         $this->query = $this->request->query();
     }
@@ -70,9 +78,8 @@ class Uri implements Htmlable
     /**
      * route
      *
-     * @param string $name
-     * @param mixed $params
-     *
+     * @param  string  $name
+     * @param  mixed  $params
      * @return $this
      */
     public function route($name, $params = [])
@@ -86,7 +93,6 @@ class Uri implements Htmlable
     /**
      * path
      *
-     * @param string $path
      * @return $this
      */
     public function path(string $path)
@@ -99,7 +105,6 @@ class Uri implements Htmlable
     /**
      * Alias to mergeQuery
      *
-     * @param array $query
      *
      * @return $this
      */
@@ -111,7 +116,6 @@ class Uri implements Htmlable
     /**
      * Merge query
      *
-     * @param array $query
      *
      * @return $this
      */
@@ -139,22 +143,21 @@ class Uri implements Htmlable
     /**
      * Replace whole query
      *
-     * @param array $query
      *
      * @return $this
      */
     public function replaceQuery(array $query)
     {
         $this->query = [];
+
         return $this->mergeQuery($query);
     }
 
     /**
      * Add or replace single query param
      *
-     * @param string $key
-     * @param mixed $value
-     *
+     * @param  string  $key
+     * @param  mixed  $value
      * @return $this
      */
     public function addQuery($key, $value)
@@ -167,8 +170,7 @@ class Uri implements Htmlable
     /**
      * Remove single query param
      *
-     * @param string $key
-     *
+     * @param  string  $key
      * @return $this
      */
     public function removeQuery($key)
@@ -181,7 +183,6 @@ class Uri implements Htmlable
     /**
      * Transform bool values to string
      *
-     * @param array $query
      *
      * @return array
      */
@@ -235,9 +236,9 @@ class Uri implements Htmlable
             ? "?{$this->buildQuery()}"
             : null;
 
-        return Str::of(request()->root())->trim('/')
-            . Str::of($this->path)->start('/')
-            . $queryString;
+        return "{$this->scheme}://{$this->host}"
+            .Str::of($this->path)->start('/')
+            .$queryString;
     }
 
     /**

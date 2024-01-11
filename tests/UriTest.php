@@ -29,7 +29,7 @@ class UriTest extends TestCase
     /** @test */
     public function it_builds_uri_from_string()
     {
-        $fromString = '/lorem?filter[ipsum]=sit&sort=-amet';
+        $fromString = 'https://other-domain.test/lorem?filter[ipsum]=sit&sort=-amet';
 
         $this->assertEquals(
             url($fromString),
