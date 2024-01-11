@@ -7,22 +7,28 @@ Adds/removes/updates query string of current request uri, accepts Laravel's arra
 You can install the package via composer:
 
 ```bash
-composer require vitnasinec/uri 
+composer require vitnasinec/uri
 ```
 
 ## Usage
 
 ``` php
-// ...?filter[foo]=bar&sort=-baz
+// https://domain.test/page?filter[foo]=bar&sort=-baz
 
 uri()->addQuery('filter.other', 'next');
-// ...?filter[foo]=bar&filter[other]=next&sort=-baz
+// https://domain.test/page?filter[foo]=bar&filter[other]=next&sort=-baz
+
+uri('http://different.test/other?filter[other]=previous')->addQuery('filter.other', 'next');
+// http://different.test/other?filter[other]=next
 
 uri()->removeQuery('filter.foo')
-// ...?sort=-baz
+// https://domain.test/page?sort=-baz
 
 uri()->mergeQuery(['filter.foo' => 'changed', 'filter.other' => 'next']);
-// ...?filter[foo]=changed&filter[other]=next&sort=-baz
+// https://domain.test/page?filter[foo]=changed&filter[other]=next&sort=-baz
+
+uri()->mergeMissingQuery(['filter.foo' => 'skipped', 'filter.added' => true]);
+// https://domain.test/page?filter[foo]=changed&filter[other]=next&sort=-baz
 
 ```
 
